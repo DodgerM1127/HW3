@@ -1,5 +1,6 @@
 streamlit
 pandas
-transformers
-torch
-pipline
+transformers[torch]>=4.35.0
+torch>=2.0.0
+accelerate>=0.21.0
+safetensors
