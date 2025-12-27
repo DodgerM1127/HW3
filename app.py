@@ -97,18 +97,22 @@ elif page == "Ocene":
                     
                     if 'text' in filtered_reviews.columns:
                         review_texts = filtered_reviews['text'].fillna("").tolist()
-                        
-                        # 3. POPRAVEK: Dodan batch_size za stabilnost na Renderju
+                        # Izvedba analize
                         sentiment_results = sentiment_pipeline(review_texts, batch_size=4)
-                        
-                        filtered_reviews['Sentiment'] = [res['label'].capitalize() for res in sentiment_results]
+
+                        # MAPIRANJE: TinyBERT običajno vrne LABEL_0 (negativno) in LABEL_1 (pozitivno)
+                        # Ustvarimo seznam z lepšimi imeni
+                        final_labels = []
+                        for res in sentiment_results:
+                            if res['label'] == 'LABEL_1':
+                                final_labels.append('Positive')
+                            elif res['label'] == 'LABEL_0':
+                                final_labels.append('Negative')
+                            else:
+                                # Za vsak slučaj, če model vrne direktno besedo
+                                final_labels.append(res['label'].capitalize())
+
+                        filtered_reviews['Sentiment'] = final_labels
                         filtered_reviews['Confidence'] = [res['score'] for res in sentiment_results]
-                        
-                        # Grafika in ostalo...
-                        sentiment_counts = filtered_reviews['Sentiment'].value_counts().reset_index()
-                        sentiment_counts.columns = ['Sentiment', 'Count']
-                        
-                        st.bar_chart(sentiment_counts, x='Sentiment', y='Count')
-                        st.dataframe(filtered_reviews[['date', 'rating', 'text', 'Sentiment', 'Confidence']])
                 else:
                     st.info(f"Ni ocen za {selected_month_label}.")
