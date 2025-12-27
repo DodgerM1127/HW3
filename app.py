@@ -3,6 +3,8 @@ import pandas as pd
 import json
 from datetime import datetime
 from transformers import pipeline
+import torch
+torch.set_grad_enabled(False)
 
 st.set_page_config(layout="wide")
 
@@ -41,7 +43,16 @@ data = load_data()
 products_df = data.get('products')
 testimonials_df = data.get('testimonials')
 reviews_df = data.get('reviews')
-sentiment_pipeline = pipeline('sentiment-analysis')
+def load_sentiment_model():
+    # Uporabimo TinyBERT, ki zasede minimalno spomina (cca 20-50MB)
+    return pipeline(
+        "sentiment-analysis", 
+        model="prajjwal1/bert-tiny", 
+        device=-1, # Prisili uporabo CPU
+        low_cpu_mem_usage=True
+    )
+
+sentiment_pipeline = load_sentiment_model()
 
 # --- Sidebar Navigacija ---
 st.sidebar.title("Navigacija")
