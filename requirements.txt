@@ -1,6 +1,6 @@
 streamlit
 pandas
-transformers[torch]>=4.35.0
-torch>=2.0.0
-accelerate>=0.21.0
-safetensors
+--index-url https://download.pytorch.org/whl/cpu
+torch
+transformers
+accelerate
